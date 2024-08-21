@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:ampiy_flutter_app/utils/helper_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../service/websocket_responce_model.dart';
+import '../widgets/coin_tile.dart';
 
 class CoinsPage extends StatefulWidget {
   const CoinsPage({super.key});
@@ -13,9 +13,9 @@ class CoinsPage extends StatefulWidget {
 
 class _CoinsPageState extends State<CoinsPage> {
   late WebSocketChannel channel;
-  late Stream<WebSocketResponse> myStream;
-  //late Stream<WebSocketResponse> myStream;
+  late Stream<WebSocketResponse> dataStream;
 
+  //connecting to the websocket server and sending the subscription message.
   connectToChannel() async {
     channel = WebSocketChannel.connect(
         Uri.parse('ws://prereg.ex.api.ampiy.com/prices'));
@@ -26,7 +26,7 @@ class _CoinsPageState extends State<CoinsPage> {
       ],
       "cid": 1
     }));
-    myStream = channel.stream
+    dataStream = channel.stream
         .map<WebSocketResponse>((value) => WebSocketResponse.fromJson(jsonDecode(value)));
   }
 
@@ -40,34 +40,30 @@ class _CoinsPageState extends State<CoinsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text('COINS',style: TextStyle(fontWeight: FontWeight.bold),),
       ),
+
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 40,
-            width: MediaQuery.of(context).size.width-32,
-            child: const TextField(
-              textAlignVertical: TextAlignVertical.bottom,
-              decoration: InputDecoration(
-                hintText: "search",
-                alignLabelWithHint: true,
-                suffixIcon: Icon(Icons.search),
-                border: OutlineInputBorder()
-              ),
-            ),
-          ),
+          buildSearchBar(context),
           const SizedBox(height: 10,),
           StreamBuilder<WebSocketResponse>(
-            stream: myStream,
+            stream: dataStream,
             builder: (context, snapshot) {
+
+              //showing a circular progress indicator,
+              // till websocket connection is being established
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return const Expanded(child: Center(child: CircularProgressIndicator()));
+
+                //if any error occurs, showing it on screen.
               } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
+                return Expanded(child: Center(child: Text('Error: ${snapshot.error}')));
+
+                //if we start receiving data, displaying it on the UI.
               } else if (snapshot.hasData) {
                 final response = snapshot.data!;
                 return Expanded(
@@ -75,49 +71,7 @@ class _CoinsPageState extends State<CoinsPage> {
                     itemCount: response.data?.length ?? 0,
                     itemBuilder: (context, index) {
                       final datum = response.data![index];
-                      //print(datum.s);
-                      return ListTile(
-                        tileColor: index%2 == 0 ? Colors.white : Colors.grey[200],
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(cryptoLogos[datum.s] ?? "https://cryptologos.cc/logos/bitcoin-btc-logo.png"),),
-                        title: Text(datum.s?.substring(0, datum.s!.length -3) ?? 'Unknown Coin', style: const TextStyle(fontWeight: FontWeight.bold),),
-                        subtitle: Text(getCryptoFullName(datum.s ?? "")),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "₹ ${datum.c}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14),),
-                            const SizedBox(width: 10),
-                            Container(
-
-                              width: 80,
-                              height: 40,
-                              //padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                border: Border.all(width: 1, color: Colors.grey)
-                              ),
-                              child: Center(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  double.parse(datum.p!) >= 0
-                                      ? const Icon(Icons.arrow_upward, color: Colors.green,size: 20,)
-                                      : const Icon(Icons.arrow_downward, color: Colors.red,size: 20,) ,
-                                  const SizedBox(width: 4,),
-                                  double.parse(datum.p!) >= 0
-                                      ? Text("${double.parse(datum.p!).toStringAsFixed(2)}%", style: const TextStyle(color:Colors.green, fontSize: 15),)
-                                      : Text("${double.parse(datum.p!).abs().toStringAsFixed(2)}%", style: const TextStyle(color:Colors.red, fontSize: 15),)
-                                ],
-                              )),
-                            ),
-                          ],
-                        ),
-                        //subtitle: Text('Current Price: ${datum.c ?? 'Unknown'}'),
-                      );
+                      return CoinTile(datum: datum, index: index,);
                     },
                   ),
                 );
@@ -127,6 +81,23 @@ class _CoinsPageState extends State<CoinsPage> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+
+  SizedBox buildSearchBar(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      width: MediaQuery.of(context).size.width-32,
+      child: const TextField(
+        textAlignVertical: TextAlignVertical.bottom,
+        decoration: InputDecoration(
+            hintText: "search",
+            alignLabelWithHint: true,
+            suffixIcon: Icon(Icons.search),
+            border: OutlineInputBorder()
+        ),
       ),
     );
   }
