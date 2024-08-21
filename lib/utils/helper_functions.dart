@@ -1,4 +1,5 @@
-// Function to return the full name of the cryptocurrency
+//We are only getting the cryptos code form the websocket, so this function
+// maps the code to the actual crypto name to display on the CoinTile.
 String getCryptoFullName(String symbol) {
   Map<String, String> cryptoNames = {
     'AMPYCINR': 'Amp',
@@ -133,6 +134,8 @@ String getCryptoFullName(String symbol) {
   return cryptoNames[symbol] ?? 'Unknown Cryptocurrency';
 }
 
+//The websocket server is not giving any logos for the Coins,
+// So generated this map to get logo based on the coins Code.
 Map<String, String> cryptoLogos = {
   'AMPYCINR': 'https://cryptologos.cc/logos/amp-amp-logo.png',
   'BTCINR': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
@@ -262,3 +265,27 @@ Map<String, String> cryptoLogos = {
   'GLMINR': 'https://cryptologos.cc/logos/golem-glm-logo.png',
   'ARKINR': 'https://cryptologos.cc/logos/ark-ark-logo.png'
 };
+
+//dummy values of PercentChange
+// to be used only till real data is unavailable
+List<String> dummyPercentChange = [
+  "+00.00",
+  "+14.05%",
+  "+12.32%",
+  "+9.42%",
+  "+7.43%",
+  "+6.01%",
+  "+1.09%"
+];
+
+//dummy values of Price
+// to be used only till real data is unavailable
+List<String> dummyPrice = [
+  "000000",
+  "4987450",
+  "217300",
+  "844.83",
+  "5246.90",
+  "205.10",
+  "29.55"
+];
