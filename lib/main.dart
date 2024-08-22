@@ -10,28 +10,22 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MainScreen(),
+    return MaterialApp(
+      themeMode: ThemeMode.dark,
+      theme: ThemeData(),
+      darkTheme : ThemeData(),
+      home: const MainScreen(),
       debugShowCheckedModeBanner: false,
-
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
-
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -41,6 +35,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    //using persistent Navigation Bar package
+    // to get the bottom navigation bar.
     return PersistentTabView(
       context,
       controller: _controller,
@@ -52,11 +49,11 @@ class _MainScreenState extends State<MainScreen> {
         ProfilePage(),
       ],
       items: [
-        PersistentBottomNavBarItem(icon: const Icon(Icons.home), title: "Home", contentPadding: 0),
-        PersistentBottomNavBarItem(icon: const Icon(Icons.currency_bitcoin), title: "coins"),
+        PersistentBottomNavBarItem(icon: const Icon(Icons.home)),
+        PersistentBottomNavBarItem(icon: const Icon(Icons.currency_bitcoin_sharp)),
         PersistentBottomNavBarItem(icon: const Icon(Icons.compare_arrows_outlined, color: Colors.white,)),
-        PersistentBottomNavBarItem(icon: const Icon(Icons.wallet), title: "wallet"),
-        PersistentBottomNavBarItem(icon: const Icon(Icons.person), title: "You")
+        PersistentBottomNavBarItem(icon: const Icon(Icons.wallet)),
+        PersistentBottomNavBarItem(icon: const Icon(Icons.person))
       ],
       navBarStyle: NavBarStyle.style15,
     );
