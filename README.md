@@ -3,7 +3,7 @@
 ![Flutter Version](https://img.shields.io/badge/flutter-v3.22.2-blue.svg)
 ![Dart Version](https://img.shields.io/badge/dart-v3.4.3-blue.svg)
 
-This project was completed as an assignment for AI Bharat. It features a redesigned home page for Ampiy and a coins screen that displays live cryptocurrency prices fetched from a provided WebSocket server.
+This project features a redesigned home page for Ampiy and a coins screen that displays live cryptocurrency prices fetched from a WebSocket server.
 
 ## Screenshots
 
